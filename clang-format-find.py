@@ -69,42 +69,40 @@ CASES = sum([
     sum(len(v) + 1 for v in INT_OPTS.values()),
 ])
 
+
 class ClangFormat:
+
+    def run_inner(self, args: list[str]):
+        args = ['clang-format'] + args
+        if self.verbose:
+            print('\n\n', ' '.join(args), file=sys.stderr)
+        proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+        assert proc.stdout
+        stdout = proc.stdout.read().decode()
+        ret = proc.wait()
+        if ret != 0:
+            raise RuntimeError(f'Failed to run clang-format command:\n' +
+                               ' '.join([f"'{a}'" for a in args]))
+        return stdout
 
     def dump_config(self, style: str):
 
-        args = ['clang-format', '--dump-config', f'--style={style}']
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-        ret = proc.wait()
-        if ret != 0:
-            print('clang-format call failed (output above)')
-            sys.exit(1)
+        stdout = self.run_inner(['--dump-config', f'--style={style}'])
 
-        opts = {}
-        assert proc.stdout
-        for ln in proc.stdout.read().splitlines():
+        opts: ConfigType = {}
+        for ln in stdout.splitlines():
             if ln and ln[0].isalpha() and ln[0].isupper():
                 key, val = ln.strip().split(':', 1)
                 opts[key] = val.strip()
 
         return opts
 
+    def run(self, filename: str, opts: ConfigType):
 
-    def run(self, fn, opts):
+        style = ',\n'.join('%s: %s' % (k, v)
+                           for (k, v) in sorted(opts.items()))
 
-        style = ',\n'.join('%s: %s' % (k, v) for (k, v) in sorted(opts.items()))
-        args = ['clang-format', '-style={%s}' % style, fn]
-        if self.verbose:
-            print('\n\n', ' '.join(args), file=sys.stderr)
-
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-        stdout = proc.stdout.read().decode()
-        ret = proc.wait()
-        if ret != 0:
-            raise RuntimeError(f'Failed to run clang-format command:\n' +
-                            ' '.join([f"'{a}'" for a in args]))
-        return stdout
-
+        return self.run_inner(['-style={%s}' % style, filename])
 
     def filescore(self, filename: str, opts: ConfigType):
 
@@ -116,7 +114,8 @@ class ClangFormat:
         res = 0
         for ln in difflib.unified_diff(old.splitlines(), new.splitlines()):
 
-            if ln.startswith('---') or ln.startswith('+++') or ln.startswith('@'):
+            if ln.startswith('---') or ln.startswith('+++') or ln.startswith(
+                    '@'):
                 continue
 
             if ln[0] in {'-', '+'}:
@@ -127,13 +126,11 @@ class ClangFormat:
 
         return res
 
-
     def score(self, files: list[str], opts: ConfigType):
         res = 0
         for fn in files:
             res += self.filescore(fn, opts)
         return res
-
 
     def show_progress(self, rel: float):
         done = ('=' * int(round(70 * rel)))[:-1] + '>'
@@ -141,7 +138,6 @@ class ClangFormat:
         sys.stderr.write('\r')
         sys.stderr.write('[%s%s] %3s%%' % (done, left, int(round(rel * 100))))
         sys.stderr.flush()
-
 
     def main(self, args: list[str]):
 
