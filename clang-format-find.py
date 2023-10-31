@@ -98,11 +98,12 @@ class ClangFormat:
             print('\n\n', ' '.join(args), file=sys.stderr)
 
         proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+        stdout = proc.stdout.read().decode()
         ret = proc.wait()
         if ret != 0:
             raise RuntimeError(f'Failed to run clang-format command:\n' +
                             ' '.join([f"'{a}'" for a in args]))
-        return proc.stdout.read().decode()
+        return stdout
 
 
     def filescore(self, filename: str, opts: ConfigType):
