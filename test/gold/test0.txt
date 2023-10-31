@@ -1,5 +1,5 @@
 # Best configuration found based on: LLVM
-# Score: 98
+# Score: 105
 AlwaysBreakTemplateDeclarations: true
 BasedOnStyle: LLVM
 ColumnLimit: 0
@@ -7,22 +7,26 @@ IndentWidth: 4
 MaxEmptyLinesToKeep: 2
 PointerAlignment: Left
 # Best configuration found based on: Google
-# Score: 105
+# Score: 112
+AccessModifierOffset: -2
 BasedOnStyle: Google
 ColumnLimit: 0
+EmptyLineBeforeAccessModifier: Leave
 IndentWidth: 4
 MaxEmptyLinesToKeep: 2
 SpacesBeforeTrailingComments: 1
 # Best configuration found based on: Chromium
-# Score: 109
+# Score: 116
+AccessModifierOffset: -2
 BasedOnStyle: Chromium
 BinPackParameters: true
 ColumnLimit: 120
+EmptyLineBeforeAccessModifier: Leave
 IndentWidth: 4
 MaxEmptyLinesToKeep: 2
 SpacesBeforeTrailingComments: 1
 # Best configuration found based on: Mozilla
-# Score: 182
+# Score: 189
 BasedOnStyle: Mozilla
 BinPackParameters: true
 BreakBeforeBraces: Attach
@@ -32,13 +36,14 @@ Cpp11BracedListStyle: true
 IndentWidth: 4
 MaxEmptyLinesToKeep: 2
 # Best configuration found based on: WebKit
-# Score: 112
+# Score: 115
 AllowShortIfStatementsOnASingleLine: true
 BasedOnStyle: WebKit
 BreakBeforeBraces: Attach
 MaxEmptyLinesToKeep: 2
 # Best configuration found based on: Microsoft
-# Score: 117
+# Score: 120
+AccessModifierOffset: -4
 AllowShortIfStatementsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: true
 BasedOnStyle: Microsoft
@@ -47,7 +52,7 @@ ColumnLimit: 0
 MaxEmptyLinesToKeep: 2
 PointerAlignment: Left
 # Best configuration found based on: GNU
-# Score: 376
+# Score: 383
 BasedOnStyle: GNU
 BreakBeforeBraces: Attach
 ColumnLimit: 120

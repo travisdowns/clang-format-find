@@ -2,8 +2,6 @@
  * perf-timer.cpp
  */
 
-#if USE_PERF_TIMER
-
 #include "perf-timer.hpp"
 
 #include <cassert>
@@ -29,6 +27,16 @@ extern "C" {
 
 
 using namespace std;
+
+struct Foo {
+
+private:
+    int i;
+    //comment
+public:
+    int x;
+
+};
 
 struct PerfEvent {
     enum Type { RAW, PERF } type;
@@ -315,7 +323,5 @@ PerfTimer::now_t PerfTimer::now() {
 }
 
 PerfTimer::~PerfTimer() = default;
-
-#endif // USE_PERF_TIMER
 
 

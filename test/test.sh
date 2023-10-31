@@ -25,7 +25,7 @@ mkdir -p "$OUT"
 $CFF $srcs > "$OUT/test0.txt"
 
 if ! cmp "$OUT/test0.txt" "$gold/test0.txt"; then
-    diff -y "$OUT/test0.txt" "$gold/test0.txt" || true
+    diff -y "$gold/test0.txt" "$OUT/test0.txt" || true
     echo "TEST0 failed, see diff above (expected on left, actual on right)"
     exit 1
 fi
