@@ -38,7 +38,8 @@ ENUM_OPTS = {
     'UseTab': ['Never', 'ForIndentation', 'Always'],
     'PointerAlignment': ['Left', 'Right', 'Middle'],
     'EmptyLineBeforeAccessModifier':
-    ['Never', 'Leave', 'LogicalBlock', 'Always']  # clang-13
+    ['Never', 'Leave', 'LogicalBlock', 'Always'],  # clang-13
+    'EmptyLineAfterAccessModifier': ['Never', 'Leave', 'Always']  # clang-13
 }
 
 INT_OPTS = {
