@@ -98,7 +98,9 @@ def run(fn, opts, verbose=None):
 
     proc = subprocess.Popen(args, stdout=subprocess.PIPE)
     ret = proc.wait()
-    assert ret == 0
+    if ret != 0:
+        raise RuntimeError(f'Failed to run clang-format command:\n' +
+                           ' '.join([f"'{a}'" for a in args]))
     return proc.stdout.read().decode()
 
 
