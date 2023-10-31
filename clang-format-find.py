@@ -1,6 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import sys, subprocess, difflib, copy
+import sys
+import subprocess
+import difflib
+import copy
+from typing import Any
+
+ConfigType = dict[str, Any]
 
 BOOL_OPTS = {
     'AlignEscapedNewlinesLeft',
@@ -14,7 +20,6 @@ BOOL_OPTS = {
     'BreakBeforeTernaryOperators',
     'BreakConstructorInitializersBeforeComma',
     'Cpp11BracedListStyle',
-    'DerivePointerBinding',
     'IndentCaseLabels',
     'IndentFunctionDeclarationAfterType',
     'ObjCSpaceBeforeProtocolList',
@@ -31,6 +36,7 @@ ENUM_OPTS = {
     'NamespaceIndentation': ['None', 'Inner', 'All'],
     'Standard': ['Cpp03', 'Cpp11', 'Auto'],
     'UseTab': ['Never', 'ForIndentation', 'Always'],
+    'PointerAlignment': ['Left', 'Right', 'Middle']
 }
 
 INT_OPTS = {
@@ -39,7 +45,7 @@ INT_OPTS = {
     'ConstructorInitializerIndentWidth': [4],
     'ContinuationIndentWidth': [4],
     'IndentWidth': [1, 2, 4, 8],
-    'MaxEmptyLinesToKeep': [1, 2],
+    'MaxEmptyLinesToKeep': [1, 2, 3, 4, 5, 6],
     'PenaltyBreakBeforeFirstCallParameter': [1, 19],
     'PenaltyBreakComment': [60],
     'PenaltyBreakFirstLessLess': [120],
@@ -50,6 +56,12 @@ INT_OPTS = {
     'TabWidth': [2, 4, 8],
 }
 
+ALL_STYLES = [
+    'LLVM', 'Google', 'Chromium', 'Mozilla', 'WebKit', 'Microsoft', 'GNU'
+]
+
+BASED_ON_STYLE = {'BasedOnStyle': ALL_STYLES}
+
 ALL_OPTS = BOOL_OPTS | set(ENUM_OPTS) | set(INT_OPTS)
 CASES = sum([
     len(BOOL_OPTS) * 3,
@@ -57,13 +69,18 @@ CASES = sum([
     sum(len(v) + 1 for v in INT_OPTS.values()),
 ])
 
-def llvm():
 
-    args = ['clang-format', '--dump-config', '--style=LLVM']
+def dump_config(style):
+
+    args = ['clang-format', '--dump-config', f'--style={style}']
     proc = subprocess.Popen(args, stdout=subprocess.PIPE)
     ret = proc.wait()
+    if ret != 0:
+        print('clang-format call failed (output above)')
+        sys.exit(1)
 
     opts = {}
+    assert proc.stdout
     for ln in proc.stdout.read().splitlines():
         if ln and ln[0].isalpha() and ln[0].isupper():
             key, val = ln.strip().split(':', 1)
@@ -71,22 +88,26 @@ def llvm():
 
     return opts
 
+
 def run(fn, opts, verbose=None):
 
     style = ',\n'.join('%s: %s' % (k, v) for (k, v) in sorted(opts.items()))
     args = ['clang-format', '-style={%s}' % style, fn]
     if verbose:
-        print >> sys.stderr, ' '.join(args)
+        print('\n\n', ' '.join(args), file=sys.stderr)
 
     proc = subprocess.Popen(args, stdout=subprocess.PIPE)
     ret = proc.wait()
-    return proc.stdout.read()
+    assert ret == 0
+    return proc.stdout.read().decode()
 
-def filescore(fn, opts, verbose=None):
 
-    with open(fn) as f:
+def filescore(filename: str, opts: ConfigType, verbose: bool):
+
+    with open(filename) as f:
         old = f.read()
-    new = run(fn, opts, verbose)
+
+    new = run(filename, opts, verbose)
 
     res = 0
     for ln in difflib.unified_diff(old.splitlines(), new.splitlines()):
@@ -97,22 +118,27 @@ def filescore(fn, opts, verbose=None):
         if ln[0] in {'-', '+'}:
             res += 1
 
+    if verbose:
+        print('Score: ', res)
     return res
 
-def score(files, opts, verbose=None):
+
+def score(files: list[str], opts: ConfigType, verbose: bool = False):
     res = 0
     for fn in files:
         res += filescore(fn, opts, verbose)
     return res
 
-def show_progress(rel):
+
+def show_progress(rel: float):
     done = ('=' * int(round(70 * rel)))[:-1] + '>'
     left = ' ' * int(round(70 * (1 - rel)))
     sys.stderr.write('\r')
     sys.stderr.write('[%s%s] %3s%%' % (done, left, int(round(rel * 100))))
     sys.stderr.flush()
 
-def main(args):
+
+def main(args: list[str]):
 
     verbose = False
     if '-v' in args:
@@ -120,41 +146,53 @@ def main(args):
         verbose = True
 
     if not args:
-        print 'no files passed'
+        print('no files passed')
         return
 
-    idx = 0
-    best = llvm()
-    base = score(args, best)
-    for opt in sorted(ALL_OPTS):
+    for based_on in ALL_STYLES:
+        idx = 0
+        # best = dump_config(initial_style)
+        best: ConfigType = {'BasedOnStyle': based_on}
+        base = score(args, best)
+        if verbose:
+            print('Base score: ', base)
+        allopts = ALL_OPTS
+        for opt in sorted(allopts):
 
-        if opt in BOOL_OPTS:
-            values = None, 'true', 'false'
-        elif opt in ENUM_OPTS:
-            values = [None] + list(ENUM_OPTS[opt])
-        elif opt in INT_OPTS:
-            values = [None] + list(INT_OPTS[opt])
-
-        for val in values:
-
-            idx += 1
-            if not verbose:
-                show_progress(idx / float(CASES))
-
-            opts = copy.copy(best)
-            if val is not None:
-                opts[opt] = val
+            if opt in BOOL_OPTS:
+                values = None, 'true', 'false'
+            elif opt in ENUM_OPTS:
+                values = [None] + list(ENUM_OPTS[opt])
+            elif opt in INT_OPTS:
+                values = [None] + list(INT_OPTS[opt])
+            elif opt in BASED_ON_STYLE:
+                values = list(BASED_ON_STYLE[opt])
             else:
-                opts.pop(opt, None)
+                raise RuntimeError(f'bad opt: {opt}')
 
-            test = score(args, opts, verbose)
-            if test < base:
-                best[opt] = val
+            for val in values:
 
-    print >> sys.stderr
-    print '# Best configuration found'
-    for k, v in sorted(best.iteritems()):
-        print '%s: %s' % (k, v)
+                idx += 1
+                if not verbose:
+                    show_progress(idx / float(CASES))
+
+                opts = copy.copy(best)
+                if val is not None:
+                    opts[opt] = val
+                else:
+                    opts.pop(opt, None)
+
+                test = score(args, opts, verbose)
+                if test < base:
+                    best[opt] = val
+                    base = test
+
+        print('', file=sys.stderr)
+        print(f'# Best configuration found based on: {based_on}')
+        print('# Score: %d' % base)
+        for k, v in sorted(best.items()):
+            print('%s: %s' % (k, v))
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])
