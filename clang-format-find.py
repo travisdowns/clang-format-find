@@ -16,7 +16,6 @@ BOOL_OPTS = {
     'AlignEscapedNewlinesLeft',
     'AlignTrailingComments',
     'AllowAllParametersOfDeclarationOnNextLine',
-    'AllowShortIfStatementsOnASingleLine',
     'AlwaysBreakBeforeMultilineStrings',
     'AlwaysBreakTemplateDeclarations',
     'BinPackParameters',
@@ -36,6 +35,8 @@ BOOL_OPTS = {
 }
 
 ENUM_OPTS = {
+    'AllowShortIfStatementsOnASingleLine':
+    ['Never', 'WithoutElse', 'OnlyFirstIf', 'AllIfsAndElse'],
     'BreakBeforeBraces': ['Attach', 'Linux', 'Stroustrup', 'Allman'],
     'NamespaceIndentation': ['None', 'Inner', 'All'],
     'Standard': ['Cpp03', 'Cpp11', 'Auto'],

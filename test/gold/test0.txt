@@ -1,13 +1,12 @@
 # Best configuration found based on: LLVM
-# Score: 105
+# Score: 113
 AlwaysBreakTemplateDeclarations: true
 BasedOnStyle: LLVM
 ColumnLimit: 0
 IndentWidth: 4
-MaxEmptyLinesToKeep: 2
 PointerAlignment: Left
 # Best configuration found based on: Google
-# Score: 112
+# Score: 118
 AccessModifierOffset: -2
 BasedOnStyle: Google
 ColumnLimit: 0
@@ -16,7 +15,7 @@ IndentWidth: 4
 MaxEmptyLinesToKeep: 2
 SpacesBeforeTrailingComments: 1
 # Best configuration found based on: Chromium
-# Score: 116
+# Score: 122
 AccessModifierOffset: -2
 AlignAfterOpenBracket: DontAlign
 BasedOnStyle: Chromium
@@ -26,7 +25,7 @@ IndentWidth: 4
 MaxEmptyLinesToKeep: 2
 SpacesBeforeTrailingComments: 1
 # Best configuration found based on: Mozilla
-# Score: 189
+# Score: 195
 AlignAfterOpenBracket: DontAlign
 BasedOnStyle: Mozilla
 BreakBeforeBraces: Attach
@@ -34,25 +33,23 @@ ColumnLimit: 120
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
 IndentWidth: 4
-MaxEmptyLinesToKeep: 2
 # Best configuration found based on: WebKit
-# Score: 115
-AllowShortIfStatementsOnASingleLine: true
+# Score: 121
+AllowShortIfStatementsOnASingleLine: WithoutElse
 BasedOnStyle: WebKit
 BreakBeforeBraces: Attach
 MaxEmptyLinesToKeep: 2
 # Best configuration found based on: Microsoft
-# Score: 120
+# Score: 128
 AccessModifierOffset: -4
-AllowShortIfStatementsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
 AlwaysBreakTemplateDeclarations: true
 BasedOnStyle: Microsoft
 BreakBeforeBraces: Attach
 ColumnLimit: 0
-MaxEmptyLinesToKeep: 2
 PointerAlignment: Left
 # Best configuration found based on: GNU
-# Score: 383
+# Score: 393
 AlignAfterOpenBracket: DontAlign
 BasedOnStyle: GNU
 BreakBeforeBraces: Attach

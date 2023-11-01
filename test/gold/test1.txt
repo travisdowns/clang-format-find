@@ -37,14 +37,14 @@ IndentWidth: 4
 MaxEmptyLinesToKeep: 2
 # Best configuration found based on: WebKit
 # Score: 80
-AllowShortIfStatementsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
 BasedOnStyle: WebKit
 BreakBeforeBraces: Attach
 MaxEmptyLinesToKeep: 2
 # Best configuration found based on: Microsoft
 # Score: 85
 AccessModifierOffset: -4
-AllowShortIfStatementsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
 AlwaysBreakTemplateDeclarations: true
 BasedOnStyle: Microsoft
 BreakBeforeBraces: Attach
