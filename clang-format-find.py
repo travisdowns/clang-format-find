@@ -67,8 +67,6 @@ ALL_STYLES = [
     'LLVM', 'Google', 'Chromium', 'Mozilla', 'WebKit', 'Microsoft', 'GNU'
 ]
 
-BASED_ON_STYLE = {'BasedOnStyle': ALL_STYLES}
-
 ALL_OPTS = BOOL_OPTS | set(ENUM_OPTS) | set(INT_OPTS)
 CASES = sum([
     len(BOOL_OPTS) * 3,
@@ -192,8 +190,6 @@ class ClangFormat:
                     values = [None] + list(ENUM_OPTS[opt])
                 elif opt in INT_OPTS:
                     values = [None] + list(INT_OPTS[opt])
-                elif opt in BASED_ON_STYLE:
-                    values = list(BASED_ON_STYLE[opt])
                 else:
                     raise RuntimeError(f'bad opt: {opt}')
 
