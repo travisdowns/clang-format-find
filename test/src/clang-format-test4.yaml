@@ -1,0 +1,11 @@
+# Best configuration found based on: WebKit
+# Score: 518
+BasedOnStyle: WebKit
+AlignArrayOfStructures: Right
+AllowShortIfStatementsOnASingleLine: true
+AlwaysBreakBeforeMultilineStrings: true
+BreakBeforeBraces: Attach
+Cpp11BracedListStyle: true
+EmptyLineBeforeAccessModifier: Never
+MaxEmptyLinesToKeep: 2
+NamespaceIndentation: None

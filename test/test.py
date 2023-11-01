@@ -32,6 +32,8 @@ all_tests: list[TestDef] = [
     TestDef([one_src], 'test1'),
     TestDef([one_src, '--based-on=LLVM'], 'test2'),
     TestDef([one_src, '--based-on=GNU'], 'test3'),
+    TestDef(all_srcs + [f'--score-only={src_dir / "clang-format-test4.yaml"}'],
+            'test4'),
 ]
 
 
