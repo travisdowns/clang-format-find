@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
 import argparse
+from pathlib import Path
 import sys
 import subprocess
 import difflib
 import copy
-from typing import Any
+from typing import Any, Optional
+
+import yaml
 
 ConfigType = dict[str, Any]
 
@@ -88,17 +91,26 @@ class ClangFormat:
             help='Specify a single based on style to start the search',
             choices=ALL_STYLES,
             type=str)
+        parser.add_argument(
+            '--score-only',
+            help=
+            'Just score the given clang-format config file againt the passed files',
+            type=Path)
         parser.add_argument('-v',
                             help='Enable verbose mode',
                             action='store_true')
         args = parser.parse_args(argv[1:])
 
+        self.file_list: list[str] = args.files
+        self.base_styles = [str(args.based_on)
+                            ] if args.based_on else ALL_STYLES
+        self.score_only: Optional[Path] = args.score_only
         self.verbose = args.v
 
     def run_inner(self, args: list[str]):
         args = ['clang-format'] + args
         if self.verbose:
-            print('\n\n', ' '.join(args), file=sys.stderr)
+            print('\n', ' '.join(args), file=sys.stderr)
         proc = subprocess.Popen(args, stdout=subprocess.PIPE)
         assert proc.stdout
         stdout = proc.stdout.read().decode()
@@ -120,22 +132,24 @@ class ClangFormat:
 
         return opts
 
-    def run(self, filename: str, opts: ConfigType):
+    def run(self, filenames: list[str], opts: ConfigType):
 
         style = ',\n'.join('%s: %s' % (k, v)
                            for (k, v) in sorted(opts.items()))
 
-        return self.run_inner(['-style={%s}' % style, filename])
+        return self.run_inner(['-style={%s}' % style] + filenames)
 
-    def filescore(self, filename: str, opts: ConfigType):
+    def filescore(self, filename: list[str], opts: ConfigType):
 
-        with open(filename) as f:
-            old = f.read()
+        all_text: list[str] = []
+
+        for f in filename:
+            all_text += (Path(f).read_text().splitlines())
 
         new = self.run(filename, opts)
 
         res = 0
-        for ln in difflib.unified_diff(old.splitlines(), new.splitlines()):
+        for ln in difflib.unified_diff(all_text, new.splitlines()):
 
             if ln.startswith('---') or ln.startswith('+++') or ln.startswith(
                     '@'):
@@ -147,12 +161,6 @@ class ClangFormat:
         if self.verbose:
             print('Score: ', res)
 
-        return res
-
-    def score(self, files: list[str], opts: ConfigType):
-        res = 0
-        for fn in files:
-            res += self.filescore(fn, opts)
         return res
 
     def show_progress(self, rel: float, label: str):
@@ -173,14 +181,25 @@ class ClangFormat:
         file_list = self.file_list
 
         if not file_list:
-            print('no files passed')
+            print('no files passed', file=sys.stderr)
             exit(1)
+
+        if self.score_only:
+            t = self.score_only.read_text()
+            opts = yaml.safe_load(t)
+            # need to replace True and False with lowercase strings
+            for k, v in opts.items():
+                if v is True or v is False:
+                    opts[k] = 'true' if v else 'false'
+            score = self.filescore(file_list, opts)
+            print(f'Score: {score}')
+            return
 
         for based_on in self.base_styles:
             idx = 0
             # best = dump_config(initial_style)
             best: ConfigType = {'BasedOnStyle': based_on}
-            best_score = self.score(file_list, best)
+            best_score = self.filescore(file_list, best)
             if self.verbose:
                 print('Base score: ', best_score)
             allopts = ALL_OPTS
@@ -208,7 +227,7 @@ class ClangFormat:
                     else:
                         opts.pop(opt, None)
 
-                    cur_score = self.score(file_list, opts)
+                    cur_score = self.filescore(file_list, opts)
                     if cur_score < best_score:
                         best[opt] = val
                         best_score = cur_score
