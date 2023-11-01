@@ -135,22 +135,28 @@ class ClangFormat:
             res += self.filescore(fn, opts)
         return res
 
-    def show_progress(self, rel: float):
-        done = ('=' * int(round(70 * rel)))[:-1] + '>'
-        left = ' ' * int(round(70 * (1 - rel)))
-        sys.stderr.write('\r')
-        sys.stderr.write('[%s%s] %3s%%' % (done, left, int(round(rel * 100))))
-        sys.stderr.flush()
+    def show_progress(self, rel: float, label: str):
+        pct = round(rel * 100, ndigits=1)
+        if self._last_pct != pct:
+            done = ('=' * int(round(70 * rel)))[:-1] + '>'
+            left = ' ' * int(round(70 * (1 - rel)))
 
-    def main(self, args: list[str]):
+            sys.stderr.write('\r')
+            sys.stderr.write(f'[{done}{left}] {pct:5.1f}% {label} ')
+            sys.stderr.flush()
+        self._last_pct = pct
 
-        if '-v' in args:
-            args.remove('-v')
+    def main(self, file_list: list[str]):
+
+        self._last_pct = -1.
+
+        if '-v' in file_list:
+            file_list.remove('-v')
             self.verbose = True
         else:
             self.verbose = False
 
-        if not args:
+        if not file_list:
             print('no files passed')
             exit(1)
 
@@ -158,9 +164,9 @@ class ClangFormat:
             idx = 0
             # best = dump_config(initial_style)
             best: ConfigType = {'BasedOnStyle': based_on}
-            base = self.score(args, best)
+            best_score = self.score(file_list, best)
             if self.verbose:
-                print('Base score: ', base)
+                print('Base score: ', best_score)
             allopts = ALL_OPTS
             for opt in sorted(allopts):
 
@@ -179,7 +185,8 @@ class ClangFormat:
 
                     idx += 1
                     if not self.verbose:
-                        self.show_progress(idx / float(CASES))
+                        label = f'best: {best_score} ({based_on})'
+                        self.show_progress(idx / float(CASES), label)
 
                     opts = copy.copy(best)
                     if val is not None:
@@ -187,14 +194,14 @@ class ClangFormat:
                     else:
                         opts.pop(opt, None)
 
-                    test = self.score(args, opts)
-                    if test < base:
+                    cur_score = self.score(file_list, opts)
+                    if cur_score < best_score:
                         best[opt] = val
-                        base = test
+                        best_score = cur_score
 
             print('', file=sys.stderr)
             print(f'# Best configuration found based on: {based_on}')
-            print('# Score: %d' % base)
+            print('# Score: %d' % best_score)
             for k, v in sorted(best.items()):
                 print('%s: %s' % (k, v))
 
