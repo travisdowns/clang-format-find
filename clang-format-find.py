@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import sys
 import subprocess
 import difflib
@@ -75,6 +76,16 @@ CASES = sum([
 
 class ClangFormat:
 
+    def __init__(self, argv: list[str]):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('files',
+                            help='One or more files to analyze',
+                            metavar='FILES',
+                            nargs='+')
+        args = parser.parse_args(argv[1:])
+
+        self.file_list = args.files
+
     def run_inner(self, args: list[str]):
         args = ['clang-format'] + args
         if self.verbose:
@@ -146,9 +157,11 @@ class ClangFormat:
             sys.stderr.flush()
         self._last_pct = pct
 
-    def main(self, file_list: list[str]):
+    def main(self):
 
         self._last_pct = -1.
+
+        file_list = self.file_list
 
         if '-v' in file_list:
             file_list.remove('-v')
@@ -207,4 +220,4 @@ class ClangFormat:
 
 
 if __name__ == '__main__':
-    ClangFormat().main(sys.argv[1:])
+    ClangFormat(sys.argv).main()
