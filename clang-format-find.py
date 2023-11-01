@@ -152,7 +152,7 @@ class ClangFormat:
 
         if not args:
             print('no files passed')
-            return
+            exit(1)
 
         for based_on in ALL_STYLES:
             idx = 0
