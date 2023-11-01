@@ -37,6 +37,9 @@ ENUM_OPTS = {
     'NamespaceIndentation': ['None', 'Inner', 'All'],
     'Standard': ['Cpp03', 'Cpp11', 'Auto'],
     'UseTab': ['Never', 'ForIndentation', 'Always'],
+    'AlignAfterOpenBracket':
+    ['Align', 'DontAlign', 'AlwaysBreak', 'BlockIndent'],
+    'AlignArrayOfStructures': ['Left', 'Right', 'None'],
     'PointerAlignment': ['Left', 'Right', 'Middle'],
     'EmptyLineBeforeAccessModifier':
     ['Never', 'Leave', 'LogicalBlock', 'Always'],  # clang-13

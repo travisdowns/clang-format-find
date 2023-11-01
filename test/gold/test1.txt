@@ -18,8 +18,8 @@ SpacesBeforeTrailingComments: 1
 # Best configuration found based on: Chromium
 # Score: 81
 AccessModifierOffset: -2
+AlignAfterOpenBracket: DontAlign
 BasedOnStyle: Chromium
-BinPackParameters: true
 ColumnLimit: 120
 EmptyLineBeforeAccessModifier: Leave
 IndentWidth: 4
@@ -27,8 +27,8 @@ MaxEmptyLinesToKeep: 2
 SpacesBeforeTrailingComments: 1
 # Best configuration found based on: Mozilla
 # Score: 153
+AlignAfterOpenBracket: DontAlign
 BasedOnStyle: Mozilla
-BinPackParameters: true
 BreakBeforeBraces: Attach
 ColumnLimit: 120
 ContinuationIndentWidth: 4
@@ -53,6 +53,7 @@ MaxEmptyLinesToKeep: 2
 PointerAlignment: Left
 # Best configuration found based on: GNU
 # Score: 338
+AlignAfterOpenBracket: DontAlign
 BasedOnStyle: GNU
 BreakBeforeBraces: Attach
 ColumnLimit: 120
