@@ -83,9 +83,15 @@ class ClangFormat:
                             help='One or more files to analyze',
                             metavar='FILES',
                             nargs='+')
+        parser.add_argument(
+            '--based-on',
+            help='Specify a single based on style to start the search',
+            choices=ALL_STYLES,
+            type=str)
         args = parser.parse_args(argv[1:])
 
         self.file_list = args.files
+        self.base_styles = [args.based_on] if args.based_on else ALL_STYLES
 
     def run_inner(self, args: list[str]):
         args = ['clang-format'] + args
@@ -174,7 +180,7 @@ class ClangFormat:
             print('no files passed')
             exit(1)
 
-        for based_on in ALL_STYLES:
+        for based_on in self.base_styles:
             idx = 0
             # best = dump_config(initial_style)
             best: ConfigType = {'BasedOnStyle': based_on}

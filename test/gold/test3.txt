@@ -1,0 +1,8 @@
+# Best configuration found based on: GNU
+# Score: 338
+AlignAfterOpenBracket: DontAlign
+BasedOnStyle: GNU
+BreakBeforeBraces: Attach
+ColumnLimit: 120
+IndentWidth: 4
+PointerAlignment: Left

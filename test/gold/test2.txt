@@ -1,0 +1,8 @@
+# Best configuration found based on: LLVM
+# Score: 70
+AlwaysBreakTemplateDeclarations: true
+BasedOnStyle: LLVM
+ColumnLimit: 0
+IndentWidth: 4
+MaxEmptyLinesToKeep: 2
+PointerAlignment: Left

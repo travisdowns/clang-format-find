@@ -15,6 +15,7 @@ src_dir = test_dir / 'src'
 root_dir = test_dir.parent
 
 all_srcs = list(map(str, src_dir.glob('*.cpp')))
+one_src = str(src_dir / 'perf-timer.cpp')
 
 
 def splitlist(s: str):
@@ -28,7 +29,9 @@ class TestDef(NamedTuple):
 
 all_tests: list[TestDef] = [
     TestDef(all_srcs, 'test0'),
-    TestDef([str(src_dir / 'perf-timer.cpp')], 'test1'),
+    TestDef([one_src], 'test1'),
+    TestDef([one_src, '--based-on=LLVM'], 'test2'),
+    TestDef([one_src, '--based-on=GNU'], 'test3'),
 ]
 
 
