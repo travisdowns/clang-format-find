@@ -88,10 +88,12 @@ class ClangFormat:
             help='Specify a single based on style to start the search',
             choices=ALL_STYLES,
             type=str)
+        parser.add_argument('-v',
+                            help='Enable verbose mode',
+                            action='store_true')
         args = parser.parse_args(argv[1:])
 
-        self.file_list = args.files
-        self.base_styles = [args.based_on] if args.based_on else ALL_STYLES
+        self.verbose = args.v
 
     def run_inner(self, args: list[str]):
         args = ['clang-format'] + args
@@ -169,12 +171,6 @@ class ClangFormat:
         self._last_pct = -1.
 
         file_list = self.file_list
-
-        if '-v' in file_list:
-            file_list.remove('-v')
-            self.verbose = True
-        else:
-            self.verbose = False
 
         if not file_list:
             print('no files passed')
